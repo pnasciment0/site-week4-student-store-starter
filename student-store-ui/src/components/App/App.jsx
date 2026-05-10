@@ -36,8 +36,43 @@ function App() {
     setSearchInputValue(event.target.value);
   };
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsFetching(true);
+      setError(null);
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/products`);
+        setProducts(response.data);
+      } catch (err) {
+        setError(err?.response?.data?.error ?? err.message);
+      } finally {
+        setIsFetching(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   const handleOnCheckout = async () => {
-  }
+    setIsCheckingOut(true);
+    setError(null);
+    try {
+      const items = Object.entries(cart).map(([productId, quantity]) => ({
+        productId: parseInt(productId),
+        quantity,
+      }));
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/orders`, {
+        customer: parseInt(userInfo.name),
+        status: "pending",
+        items,
+      });
+      setOrder(response.data);
+      setCart({});
+    } catch (err) {
+      setError(err?.response?.data?.error ?? err.message);
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
 
 
   return (

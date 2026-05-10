@@ -12,6 +12,21 @@ function ProductDetail({ addToCart, removeFromCart, getQuantityOfItemInCart }) {
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState(null);
 
+  useEffect(() => {
+    const fetchProduct = async () => {
+      setIsFetching(true);
+      setError(null);
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/products/${productId}`);
+        setProduct(response.data);
+      } catch (err) {
+        setError(err?.response?.data?.error ?? err.message);
+      } finally {
+        setIsFetching(false);
+      }
+    };
+    fetchProduct();
+  }, [productId]);
 
   if (error) {
     return <NotFound />;
@@ -39,7 +54,7 @@ function ProductDetail({ addToCart, removeFromCart, getQuantityOfItemInCart }) {
     <div className="ProductDetail">
       <div className="product-card">
         <div className="media">
-          <img src={product.image_url || "/placeholder.png"} alt={product.name} />
+          <img src={product.imageUrl || "/placeholder.png"} alt={product.name} />
         </div>
         <div className="product-info">
           <p className="product-name">{product.name}</p>

@@ -7,18 +7,16 @@ async function seed() {
   try {
     console.log('🌱 Seeding database...\n')
 
-    // Clear existing data (in order due to relations)
-    await prisma.orderItem.deleteMany()
-    await prisma.order.deleteMany()
-    await prisma.product.deleteMany()
+    // Clear existing data and reset ID sequences so seed IDs stay predictable
+    await prisma.$executeRaw`TRUNCATE "OrderItem", "Order", "Product" RESTART IDENTITY CASCADE`
 
     // Load JSON data
     const productsData = JSON.parse(
-      fs.readFileSync(path.join(__dirname, '../data/products.json'), 'utf8')
+      fs.readFileSync(path.join(__dirname, '../student-store-api/data/products.json'), 'utf8')
     )
 
     const ordersData = JSON.parse(
-      fs.readFileSync(path.join(__dirname, '../data/orders.json'), 'utf8')
+      fs.readFileSync(path.join(__dirname, '../student-store-api/data/orders.json'), 'utf8')
     )
 
     // Seed products
